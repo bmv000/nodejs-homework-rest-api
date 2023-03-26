@@ -5,7 +5,8 @@ const {
   checkContactById,
   validateCreatedContact,
   validateEditedContact,
-} = require("../../middlewares");
+  validateEditedStatus,
+} = require("../../middlewares/contactsMiddlewares");
 
 const {
   getController,
@@ -13,6 +14,7 @@ const {
   createController,
   deleteController,
   editeController,
+  statusController,
 } = require("../../controllers/contactsControllers");
 
 router.use("/:contactId", checkContactById);
@@ -26,5 +28,7 @@ router.post("/", validateCreatedContact, createController);
 router.delete("/:contactId", deleteController);
 
 router.put("/:contactId", validateEditedContact, editeController);
+
+router.patch("/:contactId/favorite", validateEditedStatus, statusController);
 
 module.exports = router;
