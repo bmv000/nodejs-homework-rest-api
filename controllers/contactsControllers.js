@@ -17,10 +17,20 @@ exports.getController = async (req, res, next) => {
   }
 };
 
-exports.getByIdController = async (req, res, next) => {
-  const { contact } = req.params;
+exports.createController = async (req, res, next) => {
   try {
-    const contactById = await getById(contact);
+    const newContact = await addContact(req.body);
+    res.status(201).json(newContact);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getByIdController = async (req, res, next) => {
+  const { contactId } = req.params;
+  try {
+    const contactById = await getById(contactId);
     res.status(200).json(contactById);
   } catch (error) {
     console.log(error);
@@ -29,36 +39,33 @@ exports.getByIdController = async (req, res, next) => {
 };
 
 exports.deleteController = async (req, res, next) => {
-  const { contact } = req;
-  await removeContact(contact.id);
+  const { contactId } = req.params;
+   try {
+     await removeContact(contactId);
 
-  res.status(200).json({ message: "contact deleted" });
-};
-
-exports.createController = async (req, res, next) => {
-  const newContact = await addContact(req.body);
-
-  res.status(201).json(newContact);
+     res.status(200).json({ message: "contact deleted" });
+   } catch (error) {
+     console.log(error);
+     res.status(500).json({ message: "Server error" });
+   }
 };
 
 exports.editeController = async (req, res, next) => {
-  const { contact } = req;
-
-  if (Object.keys(req.body).length === 0) {
-    res.status(400).json({ message: "missing fields" });
-    return;
-  }
-
-  const updatedContact = await updateContact(contact.id, req.body);
-
-  res.status(200).json(updatedContact);
+  const { contactId } = req.params;
+ try {
+   const updatedContact = await updateContact(contactId, req.body);
+   res.status(200).json(updatedContact);
+ } catch (error) {
+   console.log(error);
+   res.status(500).json({ message: "Server error" });
+ }
 };
 
 exports.statusController = async (req, res, next) => {
-  const { contact } = req.params;
+  const { contactId } = req.params;
 
   try {
-    const updatedContact = await updateStatusContact(contact, req.body);
+    const updatedContact = await updateStatusContact(contactId, req.body);
     res.status(200).json(updatedContact);
   } catch (error) {
     console.log(error);

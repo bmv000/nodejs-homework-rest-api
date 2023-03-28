@@ -17,18 +17,39 @@ const {
   statusController,
 } = require("../../controllers/contactsControllers");
 
-router.use("/:contactId", checkContactById);
 
-router.get("/", getController);
+router
+  .route("/")
+  .get(getController)
+  .post(
+    validateCreatedContact,
+    createController
+  );
 
-router.get("/:contactId", getByIdController);
+router.use("/:contactId",checkContactById);
 
-router.post("/", validateCreatedContact, createController);
+router
+  .route("/:contactId")
+  .get(getByIdController)
+  .delete(deleteController)
+  .put(
+    validateEditedContact,
+    editeController
+);
+  
+router.route('/:contactId')
+    .get(getByIdController)
+    .delete(deleteController)
+    .put(
+       validateEditedContact,
+        editeController
+)
+    router
+      .route("/:contactId/favorite")
+      .patch(
+        validateEditedStatus,
+        statusController
+      );
 
-router.delete("/:contactId", deleteController);
+    module.exports = router;
 
-router.put("/:contactId", validateEditedContact, editeController);
-
-router.patch("/:contactId/favorite", validateEditedStatus, statusController);
-
-module.exports = router;
