@@ -37,13 +37,7 @@ router
     editeController
 );
   
-router.route('/:contactId')
-    .get(getByIdController)
-    .delete(deleteController)
-    .put(
-       validateEditedContact,
-        editeController
-)
+
     router
       .route("/:contactId/favorite")
       .patch(
