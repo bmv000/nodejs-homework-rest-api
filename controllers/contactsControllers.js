@@ -62,13 +62,20 @@ exports.editeController = async (req, res, next) => {
 };
 
 exports.statusController = async (req, res, next) => {
-  const { contactId } = req.params;
+ const { contactId } = req.params;
 
-  try {
-    const updatedContact = await updateStatusContact(contactId, req.body);
-    res.status(200).json(updatedContact);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error" });
-  }
+ try {
+   const updatedContact = await updateStatusContact(contactId, req.body);
+
+   if (!updatedContact) {
+     return res.status(404).json({
+       message: "contact not found",
+     });
+   }
+
+   res.status(200).json(updatedContact);
+ } catch (error) {
+   console.log(error);
+   res.status(500).json({ message: "Server error" });
+ }
 };
