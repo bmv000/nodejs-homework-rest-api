@@ -1,43 +1,81 @@
 const {
   listContacts,
   addContact,
+  getById,
   removeContact,
   updateContact,
+  updateStatusContact,
 } = require("../models/contacts");
 
 exports.getController = async (req, res, next) => {
-  const contactsList = await listContacts();
-  res.status(200).json(contactsList);
-};
-
-exports.getByIdController = async (req, res, next) => {
-  const { contact } = req;
-
-  res.status(200).json(contact);
-};
-
-exports.deleteController = async (req, res, next) => {
-  const { contact } = req;
-  await removeContact(contact.id);
-
-  res.status(200).json({ message: "contact deleted" });
+  try {
+    const contactsList = await listContacts();
+    res.status(200).json(contactsList);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 exports.createController = async (req, res, next) => {
-  const newContact = await addContact(req.body);
+  try {
+    const newContact = await addContact(req.body);
+    res.status(201).json(newContact);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
-  res.status(201).json(newContact);
+exports.getByIdController = async (req, res, next) => {
+  const { contactId } = req.params;
+  try {
+    const contactById = await getById(contactId);
+    res.status(200).json(contactById);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.deleteController = async (req, res, next) => {
+  const { contactId } = req.params;
+   try {
+     await removeContact(contactId);
+
+     res.status(200).json({ message: "contact deleted" });
+   } catch (error) {
+     console.log(error);
+     res.status(500).json({ message: "Server error" });
+   }
 };
 
 exports.editeController = async (req, res, next) => {
-  const { contact } = req;
+  const { contactId } = req.params;
+ try {
+   const updatedContact = await updateContact(contactId, req.body);
+   res.status(200).json(updatedContact);
+ } catch (error) {
+   console.log(error);
+   res.status(500).json({ message: "Server error" });
+ }
+};
 
-  if (Object.keys(req.body).length === 0) {
-    res.status(400).json({ message: "missing fields" });
-    return;
-  }
+exports.statusController = async (req, res, next) => {
+ const { contactId } = req.params;
 
-  const updatedContact = await updateContact(contact.id, req.body);
+ try {
+   const updatedContact = await updateStatusContact(contactId, req.body);
 
-  res.status(200).json(updatedContact);
+   if (!updatedContact) {
+     return res.status(404).json({
+       message: "contact not found",
+     });
+   }
+
+   res.status(200).json(updatedContact);
+ } catch (error) {
+   console.log(error);
+   res.status(500).json({ message: "Server error" });
+ }
 };
