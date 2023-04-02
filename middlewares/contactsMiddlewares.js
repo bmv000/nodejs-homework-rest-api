@@ -1,4 +1,4 @@
-const Contact = require("../models/schema/contactModel");
+const Contact = require("../models/schema/contactSchema");
 const { Types } = require("mongoose");
 const {
   AppError,

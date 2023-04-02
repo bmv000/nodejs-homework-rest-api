@@ -5,7 +5,7 @@ const {
   removeContact,
   updateContact,
   updateStatusContact,
-} = require("../models/contacts");
+} = require("../models/contactsModels");
 
 exports.getController = async (req, res, next) => {
   try {
