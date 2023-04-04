@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { AppError } = require("../utils/appError");
 const { findUserById } = require("../models/usersModels");
 
-const CheckAuth = async (req, res, next) => {
+const checkAuth = async (req, res, next) => {
   const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ");
 
@@ -31,4 +31,4 @@ const CheckAuth = async (req, res, next) => {
   }
 };
 
-module.exports = CheckAuth;
+module.exports = checkAuth;

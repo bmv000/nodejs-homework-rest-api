@@ -12,15 +12,15 @@ const {
   validateUserRegistration,
   validateUserLogin,
 } = require("../../middlewares/usersMiddlewares");
-const CheckAuth = require("../../middlewares/authMiddlewares");
+const checkAuth = require("../../middlewares/authMiddlewares");
 
 router
   .route("/register")
   .post(validateUserRegistration, registerUserController);
 router.route("/login").post(validateUserLogin, loginUserController);
 
-router.route("/current").get(CheckAuth, currentUserController);
+router.route("/current").get(checkAuth, currentUserController);
 
-router.route("/logout").post(CheckAuth, logoutUserController);
+router.route("/logout").post(checkAuth, logoutUserController);
 
 module.exports = router;
