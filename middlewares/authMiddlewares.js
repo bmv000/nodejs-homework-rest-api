@@ -1,7 +1,6 @@
 const { SECRET_KEY } = process.env;
 const jwt = require("jsonwebtoken");
 
-const { AppError } = require("../utils/appError");
 const { findUserById } = require("../models/usersModels");
 
 const checkAuth = async (req, res, next) => {
@@ -10,14 +9,14 @@ const checkAuth = async (req, res, next) => {
 
   try {
     if (bearer !== "Bearer") {
-      return next(new AppError(401, "Not authorized"));
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     const { id } = jwt.verify(token, SECRET_KEY);
     const user = await findUserById(id);
 
     if (!user || !user.token) {
-      return next(new AppError(401, "Not authorized"));
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     req.user = user;
