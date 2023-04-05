@@ -4,9 +4,6 @@ const {
   loginUserValidator,
 } = require("../utils");
 
-
-
-
 const validateUserRegistration = (req, res, next) => {
   const { error, value } = registerUserValidator(req.body);
 
