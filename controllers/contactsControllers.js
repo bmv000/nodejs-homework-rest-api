@@ -8,8 +8,12 @@ const {
 } = require("../models/contactsModels");
 
 exports.getController = async (req, res, next) => {
+  const { _id } = req.user;
+  const { page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
+  const paginationOptions = { skip, limit: Number(limit) };
   try {
-    const contactsList = await listContacts();
+    const contactsList = await listContacts({owner: _id}, paginationOptions);
     res.status(200).json(contactsList);
   } catch (error) {
     console.log(error);
@@ -18,8 +22,9 @@ exports.getController = async (req, res, next) => {
 };
 
 exports.createController = async (req, res, next) => {
+  const { _id } = req.user;
   try {
-    const newContact = await addContact(req.body);
+    const newContact = await addContact({ ...req.body, owner: _id });
     res.status(201).json(newContact);
   } catch (error) {
     console.log(error);
@@ -29,8 +34,9 @@ exports.createController = async (req, res, next) => {
 
 exports.getByIdController = async (req, res, next) => {
   const { contactId } = req.params;
+  const { _id } = req.user;
   try {
-    const contactById = await getById(contactId);
+    const contactById = await getById({ _id: contactId, owner: _id });
     res.status(200).json(contactById);
   } catch (error) {
     console.log(error);
@@ -40,9 +46,14 @@ exports.getByIdController = async (req, res, next) => {
 
 exports.deleteController = async (req, res, next) => {
   const { contactId } = req.params;
+   const { _id } = req.user;
    try {
-     await removeContact(contactId);
-
+     const deletedContact = await removeContact({ _id: contactId, owner: _id });
+     if (!deletedContact) {
+       return res.status(404).json({
+         message: "contact not found",
+       });
+     }
      res.status(200).json({ message: "contact deleted" });
    } catch (error) {
      console.log(error);
@@ -52,8 +63,17 @@ exports.deleteController = async (req, res, next) => {
 
 exports.editeController = async (req, res, next) => {
   const { contactId } = req.params;
+  const { _id } = req.user;
  try {
-   const updatedContact = await updateContact(contactId, req.body);
+   const updatedContact = await updateContact(
+     { _id: contactId, owner: _id },
+     req.body
+   );
+   if (!updatedContact) {
+     return res.status(404).json({
+       message: "contact not found",
+     });
+   }
    res.status(200).json(updatedContact);
  } catch (error) {
    console.log(error);
@@ -63,9 +83,12 @@ exports.editeController = async (req, res, next) => {
 
 exports.statusController = async (req, res, next) => {
  const { contactId } = req.params;
-
+const { _id } = req.user;
  try {
-   const updatedContact = await updateStatusContact(contactId, req.body);
+   const updatedContact = await updateStatusContact(
+     { _id: contactId, owner: _id },
+     req.body
+   );
 
    if (!updatedContact) {
      return res.status(404).json({

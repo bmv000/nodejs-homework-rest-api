@@ -2,7 +2,10 @@ const {
   AppError,
   registerUserValidator,
   loginUserValidator,
-} = require("../utils/userValidator");
+} = require("../utils");
+
+
+
 
 const validateUserRegistration = (req, res, next) => {
   const { error, value } = registerUserValidator(req.body);
