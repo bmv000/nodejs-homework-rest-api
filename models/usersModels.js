@@ -15,9 +15,14 @@ const findUserByIdAndUpdate = async (id, token) => {
   return await User.findByIdAndUpdate(id, { token });
 };
 
+const findUserByIdAndUpdateAvatar = async (id, avatar) => {
+  return await User.findByIdAndUpdate(id, { avatar });
+};
+
 module.exports = {
+  registerUser,
   findUser,
   findUserById,
   findUserByIdAndUpdate,
-  registerUser,
+  findUserByIdAndUpdateAvatar,
 };
