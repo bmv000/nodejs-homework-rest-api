@@ -2,9 +2,9 @@ const Joi = require("joi");
 
 const createContactValidator = (data) => {
   const schema = Joi.object({
-    name: Joi.string().alphanum().required(),
+    name: Joi.string().min(1).max(30).required(),
     email: Joi.string().email().required(),
-    phone: Joi.string().required(),
+    phone: Joi.string().min(5).max(30).required(),
     favorite: Joi.bool(),
   });
 
@@ -13,9 +13,9 @@ const createContactValidator = (data) => {
 
 const editeContactValidator = (data) => {
   const schema = Joi.object({
-    name: Joi.string().alphanum(),
+    name: Joi.string().min(1).max(30),
     email: Joi.string().email(),
-    phone: Joi.string(),
+    phone: Joi.string().min(5).max(30),
     favorite: Joi.bool(),
   });
 

@@ -3,6 +3,6 @@ class AppError extends Error {
     super(message);
     this.status = status;
   }
-}
+};
 
 module.exports = AppError;

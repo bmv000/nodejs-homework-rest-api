@@ -17,6 +17,9 @@ const {
   statusController,
 } = require("../../controllers/contactsControllers");
 
+const checkAuth = require("../../middlewares/authMiddlewares")
+
+router.use("/", checkAuth);
 
 router
   .route("/")
