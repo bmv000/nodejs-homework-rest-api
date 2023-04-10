@@ -14,7 +14,7 @@ const {
   validateUserLogin,
 } = require("../../middlewares/usersMiddlewares");
 const checkAuth = require("../../middlewares/authMiddlewares");
-const upload = require("../../middlewares/upload");
+const { upload } = require("../../middlewares/upload");
 
 
 router
