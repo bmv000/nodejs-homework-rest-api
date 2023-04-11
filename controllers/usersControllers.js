@@ -7,7 +7,13 @@ const {
   registerUser,
   findUser,
   findUserByIdAndUpdate,
+  findUserByIdAndUpdateAvatar
 } = require("../models/usersModels");
+
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+const Jimp = require("jimp");
 
 const registerUserController = async (req, res, next) => {
   const { password, email, subscription } = req.body;
@@ -22,14 +28,17 @@ const registerUserController = async (req, res, next) => {
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
   try {
+    const avatarURL = gravatar.url(email);
     const newUser = await registerUser({
       password: hashPassword,
       email,
       subscription,
+      avatarURL
     });
     res.status(201).json({
       user: {
         email,
+        avatarURL,
         subscription: newUser.subscription,
       },
     });
@@ -88,12 +97,41 @@ const logoutUserController = async (req, res, next) => {
 };
 
 const currentUserController = async (req, res, next) => {
-  const { email, subscription } = req.user;
+  const { email, subscription, avatarURL } = req.user;
 
   res.status(200).json({
     email,
     subscription,
-     });
+    avatarURL,
+  });
+};
+
+const updateAvatarController = async (req, res) => {
+  const { path: tempUpload, originalname } = req.file;
+  const { _id: id } = req.user;
+  const imageName = `${id}_${originalname}`;
+  const avatarDir = path.join(__dirname, "../", "public", "avatars");
+
+  try {
+    (await Jimp.read(tempUpload))
+      .autocrop()
+      .cover(
+        250,
+        250,
+        Jimp.HORIZONTAL_ALIGN_CENTER || Jimp.VERTICAL_ALIGN_MIDDLE
+      )
+      .quality(90)
+      .writeAsync(tempUpload);
+
+    const resultUpload = path.join(avatarDir, imageName);
+    await fs.rename(tempUpload, resultUpload);
+    const avatarURL = path.join("public", "avatars", imageName);
+    await findUserByIdAndUpdateAvatar(req.user._id, avatarURL);
+    res.json({ avatarURL, });
+  } catch (error) {
+    await fs.unlink(tempUpload);
+    throw error;
+  }
 };
 
 module.exports = {
@@ -101,4 +139,5 @@ module.exports = {
   loginUserController,
   logoutUserController,
   currentUserController,
+  updateAvatarController,
 };
