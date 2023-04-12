@@ -1,4 +1,3 @@
-
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = process.env;
@@ -7,13 +6,17 @@ const {
   registerUser,
   findUser,
   findUserByIdAndUpdate,
-  findUserByIdAndUpdateAvatar
+  findUserByIdAndUpdateAvatar,
+  verificationUserToken,
+  updateUserVerifi,
+  resendingEmailForVerify,
 } = require("../models/usersModels");
 
 const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
 const Jimp = require("jimp");
+const { v4: uuidv4 } = require("uuid");
 
 const registerUserController = async (req, res, next) => {
   const { password, email, subscription } = req.body;
@@ -29,17 +32,20 @@ const registerUserController = async (req, res, next) => {
 
   try {
     const avatarURL = gravatar.url(email);
+    const verificationToken = uuidv4();
     const newUser = await registerUser({
       password: hashPassword,
       email,
       subscription,
-      avatarURL
+      avatarURL,
+      verificationToken,
     });
     res.status(201).json({
       user: {
         email,
         avatarURL,
         subscription: newUser.subscription,
+        verificationToken,
       },
     });
   } catch (error) {
@@ -127,10 +133,67 @@ const updateAvatarController = async (req, res) => {
     await fs.rename(tempUpload, resultUpload);
     const avatarURL = path.join("public", "avatars", imageName);
     await findUserByIdAndUpdateAvatar(req.user._id, avatarURL);
-    res.json({ avatarURL, });
+    res.json({ avatarURL });
   } catch (error) {
     await fs.unlink(tempUpload);
     throw error;
+  }
+};
+
+const verifyEmailController = async (req, res, next) => {
+  const { verificationToken } = req.params;
+  const user = await verificationUserToken({
+    verificationToken,
+  });
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  try {
+    await updateUserVerifi(user._id, {
+      verify: true,
+      verificationToken: null,
+    });
+    res.status(200).json({
+      message: "Verification successful",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+const resendingEmailController = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await verificationUserToken({ email });
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  try {
+    if (!user.verify) {
+      await resendingEmailForVerify(user._id);
+      res.status(200).json({
+        message: "Verification email sent",
+      });
+    } else {
+      res.status(400).json({
+        message: "Verification has already been passed",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 };
 
@@ -140,4 +203,6 @@ module.exports = {
   logoutUserController,
   currentUserController,
   updateAvatarController,
+  verifyEmailController,
+  resendingEmailController,
 };
