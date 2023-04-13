@@ -7,6 +7,7 @@ const {
 const {
   registerUserValidator,
   loginUserValidator,
+  verifyUserEmailValidator,
 } = require("./userValidator");
 
 module.exports = {
@@ -16,4 +17,5 @@ module.exports = {
   editeContactValidator,
   registerUserValidator,
   loginUserValidator,
+  verifyUserEmailValidator,
 };
