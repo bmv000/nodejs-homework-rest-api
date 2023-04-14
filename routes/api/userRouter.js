@@ -8,10 +8,13 @@ const {
   logoutUserController,
   currentUserController,
   updateAvatarController,
+  verifyEmailController,
+  resendingEmailController,
 } = require("../../controllers/usersControllers");
 const {
   validateUserRegistration,
   validateUserLogin,
+  validateUserConfirmation,
 } = require("../../middlewares/usersMiddlewares");
 const checkAuth = require("../../middlewares/authMiddlewares");
 const { upload } = require("../../middlewares/upload");
@@ -20,6 +23,17 @@ const { upload } = require("../../middlewares/upload");
 router
   .route("/register")
   .post(validateUserRegistration, registerUserController);
+
+  router
+    .route("/verify/:verificationToken")
+    .get(verifyEmailController);
+
+  router
+    .route("/verify")
+    .post(
+      validateUserConfirmation,
+      resendingEmailController
+    );
 router.route("/login").post(validateUserLogin, loginUserController);
 
 router.route("/current").get(checkAuth, currentUserController);

@@ -19,7 +19,16 @@ const loginUserValidator = (data) => {
   return schema.validate(data);
 };
 
+const verifyUserEmailValidator = (data) => {
+  const schema = Joi.object({
+    email: Joi.string().required(),
+  });
+
+  return schema.validate(data);
+};
+
 module.exports = {
   registerUserValidator,
   loginUserValidator,
+  verifyUserEmailValidator,
 };
